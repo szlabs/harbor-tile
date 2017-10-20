@@ -41,7 +41,7 @@ packages:
     max_in_flight: 1
     properties:
       harbor:
-        ui_url_protocol: (( .properties.<ui_url_protocol> ))
+        ui_url_protocol: (( .properties.ui_url_protocol.value ))
 
 
 

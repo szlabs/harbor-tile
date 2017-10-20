@@ -34,7 +34,7 @@ If you want to build you own ops manager environment to validate the tile you bu
 * [Configuring Ops Manager Director for VMware vSphere](http://docs.pivotal.io/pivotalcf/1-12/customizing/vsphere-config.html)
 
 ## Build and Test
-Use the following command to initialize tile project if not.
+Use the following command to initialize tile project if not create yet.
 ```
 cd YOUR-PROD-DIRECTORY
 tile init
@@ -44,9 +44,6 @@ tile init
 Edit the generated **tile.yml** file to define your tile.
 ```
 ---
-# The high-level description of your tile.
-# Replace these properties with real values.
-#
 name: harbor-tile # By convention lowercase with dashes
 icon_file: resources/harbor.png
 label: Harbor
@@ -68,8 +65,52 @@ packages:
     instances: 1
     static_ip: 0
     dynamic_ip: 1
-    default_internet_connected: true
+    default_internet_connected: false
     max_in_flight: 1
+    properties:
+      harbor:
+        ui_url_protocol: (( .properties.ui_url_protocol.value ))
+
+stemcell_criteria:
+  os: ubuntu-trusty
+  requires_cpi: false
+  version: '3445.11' #Harbor BOSH release is built based on this version. Let's use it at present!
+
+forms:
+- name: harbor_properties
+  label: Harbor Configurations
+  description: Set the following properties to confgure Harbor
+  properties:
+  - name: ui_url_protocol
+    type: dropdown_select
+    label: HTTP Protocol
+    description: The protocol for accessing the UI and token/notification service
+    options:
+    - name: http
+      label: HTTP
+      default: true
+    - name: https
+      label: HTTPS
+- name: uaa_settings
+  label: UAA Settings
+  description: Set the UAA configurations as AUTH provider
+  properties:
+  - name: uaa_address
+    type: string
+    label: UAA Address
+  - name: uaa_client_id
+    type: string
+    label: Client id
+  - name: uaa_client_secret
+    type: secret
+    label: Client Secret
+
+update:
+  canaries: 1
+  canary_watch_time: 10000-100000
+  max_in_flight: 1
+  update_watch_time: 10000-100000
+
 ```
 
 Build the tile.
@@ -78,9 +119,18 @@ Build the tile.
 tile build [version]
 
 ```
+The build command will generate the **product** folder which contains the deployable *.pivotal tile file and all the artifacts that tile required. A new product tile yaml file **[product name].yml** will also created under the **product/metadata/** based on the tile.yml you edited above. The related properties will be redefined by the generator.
 
-You can import the generated tile file which is located in the **product** folder into the ops manager to try the product deployment.
+**NOTES: The generated yml file may include some properties related with Pivotal Elastic Runtime (always start with ..cf). If your deployment is built on BOSH release, that means it does not depend on Pivotal Elastic Runtime, you can remove those properties. Otherwise, the deployment will be definitely failed.**
+
+You can import the generated Harbor tile file which is located in the **product** folder into the ops manager to try the product deployment.
 ![import product](resources/ops-manager.png)
+
+Configure the Harbor.
+![import product](resources/config.png)
+
+Check the status after a successfully deployment.
+![import product](resources/status_check.png)
 
 ## Example
 Here is a sample provided by Pivotal team for your reference.[sample](https://github.com/cf-platform-eng/tile-generator/tree/master/sample)
