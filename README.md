@@ -41,6 +41,19 @@ tile init
 
 ```
 
+**NOTES:To avoid keeping too large files in this repository, the Harbor BOSH release tarball this tile required is not pushed here. So before building the tile, you need to create the Harbor BOSH release tarball firstly if you don't have it in hands.**
+
+Create Harbor BOSH release with tarball and put it under the resource folder. If tarball name changed, don't forget to change the release reference in the tile.yml.
+```
+git clone https://github.com/steven-zou/harbor-bosh-release
+
+cd harbor-bosh-release
+
+#--force create dev release, --final create formal release
+bosh create-release --name harbor-bosh-release --version <new version> --tarball=<tarball path and name> --[force/final]
+
+```
+
 Edit the generated **tile.yml** file to define your tile.
 ```
 ---
