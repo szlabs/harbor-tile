@@ -1,0 +1,9 @@
+Name: tile-generator
+Version: 9.1.1
+Summary: Tools supporting development of Pivotal Cloud Foundry services and add-ons.
+Home-page: https://github.com/cf-platform-eng/tile-generator
+Author: Pivotal Cloud Foundry Platform Engineering
+Author-email: UNKNOWN
+License: Apache 2.0
+Location: /Users/szou/VMware/Projects/bosh/tile/tile-generator-env/lib/python2.7/site-packages
+Requires: Jinja2, PyYAML, mock, docker-py, requests-toolbelt, requests, click

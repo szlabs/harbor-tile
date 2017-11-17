@@ -47,13 +47,13 @@ property_blueprints:
 - configurable: false
   description: The password for the database used by Clair
   label: Clair database password
-  name: clair_db_password
+  name: clair_db_credential
   optional: false
   type: simple_credentials
 - configurable: false
   description: The password for the database used by Harbor itself
   label: Harbor database password
-  name: harbor_db_password
+  name: harbor_db_credential
   optional: false
   type: simple_credentials
 - configurable: true
@@ -171,79 +171,11 @@ form_types:
 
 
 job_types:
-- name: docker
-  resource_label: docker
-  templates:
-  - name: docker
-    release: harbor
-  resource_definitions:
-  - name: ram
-    type: integer
-    configurable: false
-    default: 4096
-    constraints:
-      min: 4096
-  - name: ephemeral_disk
-    type: integer
-    configurable: false
-    default: 10240
-    constraints:
-      min: 10240
-  - name: persistent_disk
-    type: integer
-    configurable: false
-    default: 20480
-    constraints:
-      min: 20480
-  - name: cpu
-    type: integer
-    configurable: false
-    default: 1
-    constraints:
-      min: 1
-  static_ip: 0
-  dynamic_ip: 1
-  max_in_flight: 1
-  single_az_only: False
-  default_internet_connected: False
-  instance_definition:
-    name: instances
-    type: integer
-    configurable: true
-    default: 1
-  property_blueprints:
-  - name: vm_credentials
-    type: salted_credentials
-    default:
-      identity: vcap
-  manifest: |
-    admin_password: (( .properties.admin_password.value ))
-    allow_paid_service_plans: (( .properties.allow_paid_service_plans.value ))
-    apply_open_security_group: (( .properties.apply_open_security_group.value ))
-    clair_db_password:
-      identity: (( .properties.clair_db_password.identity ))
-      password: (( .properties.clair_db_password.password ))
-    harbor:
-      name: harbor
-    harbor_db_password:
-      identity: (( .properties.harbor_db_password.identity ))
-      password: (( .properties.harbor_db_password.password ))
-    org: (( .properties.org.value ))
-    server_cert_key:
-      cert_and_private_key_pems: (( .properties.server_cert_key.cert_and_private_key_pems ))
-      cert_pem: (( .properties.server_cert_key.cert_pem ))
-      private_key_pem: (( .properties.server_cert_key.private_key_pem ))
-      public_key_pem: (( .properties.server_cert_key.public_key_pem ))
-    space: (( .properties.space.value ))
-    uaa_address: (( .properties.uaa_address.value ))
-    uaa_client_id: (( .properties.uaa_client_id.value ))
-    uaa_client_secret: (( .properties.uaa_client_secret.value ))
-    ui_url_protocol: (( .properties.ui_url_protocol.value ))
-    with_clair: (( .properties.with_clair.value ))
-    with_notary: (( .properties.with_notary.value ))
 - name: harbor-app
   resource_label: harbor-app
   templates:
+  - name: docker
+    release: harbor
   - name: harbor
     release: harbor
   resource_definitions:
@@ -290,15 +222,16 @@ job_types:
     admin_password: (( .properties.admin_password.value ))
     allow_paid_service_plans: (( .properties.allow_paid_service_plans.value ))
     apply_open_security_group: (( .properties.apply_open_security_group.value ))
-    clair_db_password:
-      identity: (( .properties.clair_db_password.identity ))
-      password: (( .properties.clair_db_password.password ))
-    db_password: (( .properties.harbor_db_password.password ))
+    clair_db_credential:
+      identity: (( .properties.clair_db_credential.identity ))
+      password: (( .properties.clair_db_credential.password ))
+    clair_db_password: (( .properties.clair_db_credential.password ))
+    db_password: (( .properties.harbor_db_credential.password ))
     harbor:
       name: harbor
-    harbor_db_password:
-      identity: (( .properties.harbor_db_password.identity ))
-      password: (( .properties.harbor_db_password.password ))
+    harbor_db_credential:
+      identity: (( .properties.harbor_db_credential.identity ))
+      password: (( .properties.harbor_db_credential.password ))
     org: (( .properties.org.value ))
     server_cert_key:
       cert_and_private_key_pems: (( .properties.server_cert_key.cert_and_private_key_pems ))
