@@ -13,6 +13,8 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 .DS_Store
-resources/harbor-bosh-release-*.tgz
 **/product/*.pivotal
 **/product/*.tgz
+**/resources/*.tgz
+**/product/releases/*.tgz
+**/release/*

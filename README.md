@@ -57,20 +57,51 @@ bosh create-release --name harbor-bosh-release --version <new version> --tarball
 Edit the generated **tile.yml** file to define your tile.
 ```
 ---
+# The high-level description of your tile.
+# Replace these properties with real values.
+#
 name: harbor-tile # By convention lowercase with dashes
 icon_file: resources/harbor.png
 label: Harbor
 description: Project Harbor is an enterprise-class registry server that stores and distributes Docker images. Harbor extends the open source Docker Distribution by adding the functionalities usually required by an enterprise, such as security, identity and management.
+# metadata_version: 1.8                 # Optional, defaults to 1.5
 
+# Global defaults (all optional)
+#
+# org: test-org                         # Name of org to create for your apps
+# space: test-space                     # Name of space to create for your apps
+# apply_open_security_group: true       # Apply open security group, default: false
+
+# Specify the packages to be included in your tile.
+# The format of the section to include depends on the type
+# of package you are describing. For fragments of each type
+# that you can copy & paste, see:
+#
+# https://github.com/cf-platform-eng/tile-generator/blob/master/README.md
+#
 packages:
 - name: harbor
   type: bosh-release
-  path: resources/harbor-bosh-release_0.1.3+dev.01.tgz
+  path: resources/harbor-0.3.0.tgz
   jobs:
+  - name: docker
+    templates:
+    - name: docker
+      release: harbor
+    cpu: 1
+    memory: 4096
+    ephemeral_disk: 10240
+    persistent_disk: 20480
+    instances: 1
+    static_ip: 0
+    dynamic_ip: 1
+    default_internet_connected: false
+    max_in_flight: 1
+  
   - name: harbor-app
     templates:
     - name: harbor
-      release: harbor-bosh-release
+      release: harbor
     cpu: 1
     memory: 4096
     ephemeral_disk: 10240
@@ -81,14 +112,48 @@ packages:
     default_internet_connected: false
     max_in_flight: 1
     properties:
-      harbor:
-        ui_url_protocol: (( .properties.ui_url_protocol.value ))
+      ui_url_protocol: (( .properties.ui_url_protocol.value ))
+      admin_password: (( .properties.admin_password.value ))
+      db_password: (( .properties.harbor_db_password.password ))
+      clair_db_password: (( .properties.clair_db_password.password ))
+      with_clair: (( .properties.with_clair.value ))
+      with_notary: (( .properties.with_notary.value ))
+      ssl:
+        cert: (( .properties.server_cert_key.cert_pem ))
+        key: (( .properties.server_cert_key.private_key_pem ))
+        ca: (( $ops_manager.ca_certificate ))
 
+
+
+# Include stemcell criteria if you don't want to accept the default.
+# Since this stemcell is only used to run pre and post errands, we
+# strongly recommend you leave this alone so that your tile always
+# runs with the latest stemcell.
+#
 stemcell_criteria:
   os: ubuntu-trusty
   requires_cpi: false
-  version: '3445.11' #Harbor BOSH release is built based on this version. Let's use it at present!
+  version: '3445.11'
 
+# Add properties you want to pass to your applications.
+# Properties specified here will not be configurable by the user.
+#
+properties:
+- name: clair_db_password
+  type: simple_credentials
+  label: Clair database password
+  description: The password for the database used by Clair
+- name: harbor_db_password
+  type: simple_credentials
+  label: Harbor database password
+  description: The password for the database used by Harbor itself
+
+# Uncomment this section if you want to display forms with configurable
+# properties in Ops Manager. These properties will be passed to your
+# applications as environment variables. You can also refer to them
+# elsewhere in this template by using:
+#     (( .properties.<property-name> ))
+# 
 forms:
 - name: harbor_properties
   label: Harbor Configurations
@@ -99,14 +164,45 @@ forms:
     label: HTTP Protocol
     description: The protocol for accessing the UI and token/notification service
     options:
-    - name: http
-      label: HTTP
-      default: true
     - name: https
       label: HTTPS
+      default: true
+    - name: http
+      label: HTTP
+  - name: admin_password
+    type: secret
+    label: Admin Password
+    description: The password for the system administrator
+
+- name: certificate_settings
+  label: Certificate
+  description: Configure the SSL certificate and private key for Harbor
+  properties:
+  - name: server_cert_key
+    type: rsa_cert_credentials
+    label: SSL Certificate and key PEMs
+
+- name: clair_settings
+  label: Clair Settings
+  description: Determine if include Clair in the deployment to support vulnerability scanning
+  properties:
+  - name: with_clair
+    type: boolean
+    label: Install Clair
+    description: Checked to install Clair
+
+- name: notary_settings
+  label: Notary Settings
+  description: Determine if include Notary in the deployment to support content trust
+  properties:
+  - name: with_notary
+    type: boolean
+    label: Install Notary
+    description: Checked to install Notary
+
 - name: uaa_settings
   label: UAA Settings
-  description: Set the UAA configurations as AUTH provider
+  description: Set the UAA configurations as AUTH provider(Experimental)
   properties:
   - name: uaa_address
     type: string
@@ -118,11 +214,30 @@ forms:
     type: secret
     label: Client Secret
 
+# Add any dependencies your tile has on other installed products.
+# This is often appropriate when using automatic service provisioning
+# for any of your packages above, with services provided by other
+# products.
+#
+# requires_product_versions:
+# - name: p-mysql
+#   version: '~> 1.7'
+
+# Customize upgrade parameters if the defaults don't meet your needs.
+#
 update:
   canaries: 1
-  canary_watch_time: 10000-100000
-  max_in_flight: 1
-  update_watch_time: 10000-100000
+  canary_watch_time: 30000-600000
+  max_in_flight: 3
+  update_watch_time: 30000-600000
+
+# If prior versions of your tile are installed and configured, their
+# property values will not be overwritten by new defaults provided
+# in this file. If that is your intent, you must do the overwriting
+# explicitly using JavaScript migration functions, like so:
+#
+# migration: |
+#   properties['properties']['.properties.org']['value'] = 'system';
 
 ```
 
