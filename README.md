@@ -10,7 +10,7 @@ Project to build the tile for Harbor based on Harbor bosh release.
 packages:
 - name: harbor
   type: bosh-release
-  path: resources/harbor-bosh-release_0.1.3+dev.01.tgz
+  path: resources/habo.tgz
 ```
 
 ## Setup DEV environment
@@ -250,6 +250,23 @@ tile build [version]
 The build command will generate the **product** folder which contains the deployable *.pivotal tile file and all the artifacts that tile required. A new product tile yaml file **[product name].yml** will also created under the **product/metadata/** based on the tile.yml you edited above. The related properties will be redefined by the generator.
 
 **NOTES: The generated yml file may include some properties related with Pivotal Elastic Runtime (always start with ..cf). If your deployment is built on BOSH release, that means it does not depend on Pivotal Elastic Runtime, you can remove those properties. Otherwise, the deployment will be definitely failed.**
+
+There is also an **alternative** way to build the tile package.
+Open the **harbor-tile.yml** file under product/metadata, replace the following template variables with the real values:
+```
+{{product_version}} ##product version with format x.x.x
+
+{{bosh_release_file}} ##File name of your bosh release tarball under the releases folder
+
+{{bosh_release_name}} ##The name of the bosh release
+
+{{bosh_release_version}} ##The version of the bosh release
+```
+
+Then create the tile package with zip command:
+```
+```
+
 
 You can import the generated Harbor tile file which is located in the **product** folder into the ops manager to try the product deployment.
 ![import product](resources/ops-manager.png)

@@ -22,7 +22,7 @@ description: Project Harbor is an enterprise-class registry server that stores a
 # https://github.com/cf-platform-eng/tile-generator/blob/master/README.md
 #
 packages:
-- name: harbor
+- name: habo
   type: bosh-release
   path: resources/harbor-0.3.0.tgz
   jobs:  
