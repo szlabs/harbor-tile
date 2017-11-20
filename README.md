@@ -112,10 +112,11 @@ packages:
     default_internet_connected: false
     max_in_flight: 1
     properties:
+      hostname: (( .properties.hostname.value ))
       ui_url_protocol: (( .properties.ui_url_protocol.value ))
       admin_password: (( .properties.admin_password.value ))
-      db_password: (( .properties.harbor_db_password.password ))
-      clair_db_password: (( .properties.clair_db_password.password ))
+      db_password: (( .properties.harbor_db_credential.password ))
+      clair_db_password: (( .properties.clair_db_credential.password ))
       with_clair: (( .properties.with_clair.value ))
       with_notary: (( .properties.with_notary.value ))
       ssl:
@@ -200,20 +201,6 @@ forms:
     label: Install Notary
     description: Checked to install Notary
 
-- name: uaa_settings
-  label: UAA Settings
-  description: Set the UAA configurations as AUTH provider(Experimental)
-  properties:
-  - name: uaa_address
-    type: string
-    label: UAA Address
-  - name: uaa_client_id
-    type: string
-    label: Client id
-  - name: uaa_client_secret
-    type: secret
-    label: Client Secret
-
 # Add any dependencies your tile has on other installed products.
 # This is often appropriate when using automatic service provisioning
 # for any of your packages above, with services provided by other
@@ -265,6 +252,9 @@ Open the **harbor-tile.yml** file under product/metadata, replace the following 
 
 Then create the tile package with zip command:
 ```
+cd product
+
+zip -r harbor-x.x.x.pivotal metadata migrations releases
 ```
 
 
