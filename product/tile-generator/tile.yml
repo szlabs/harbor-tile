@@ -42,6 +42,7 @@ packages:
     default_internet_connected: false
     max_in_flight: 1
     properties:
+      hostname: (( .properties.hostname.value ))
       ui_url_protocol: (( .properties.ui_url_protocol.value ))
       admin_password: (( .properties.admin_password.value ))
       db_password: (( .properties.harbor_db_credential.password ))
@@ -89,6 +90,10 @@ forms:
   label: Harbor Configurations
   description: Set the following properties to confgure Harbor
   properties:
+  - name: hostname
+    type: string
+    label: Hostname
+    description: The hostname of harbor
   - name: ui_url_protocol
     type: dropdown_select
     label: HTTP Protocol
@@ -129,20 +134,6 @@ forms:
     type: boolean
     label: Install Notary
     description: Checked to install Notary
-
-- name: uaa_settings
-  label: UAA Settings
-  description: Set the UAA configurations as AUTH provider(Experimental)
-  properties:
-  - name: uaa_address
-    type: string
-    label: UAA Address
-  - name: uaa_client_id
-    type: string
-    label: Client id
-  - name: uaa_client_secret
-    type: secret
-    label: Client Secret
 
 # Add any dependencies your tile has on other installed products.
 # This is often appropriate when using automatic service provisioning
