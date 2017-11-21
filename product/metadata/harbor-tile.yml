@@ -11,7 +11,7 @@ serial: true
 
 releases:
 - file: {{bosh_release_file}}
-  name: {{bosh_release_name}}
+  name: harbor
   version: '{{bosh_release_version}}'
 
 stemcell_criteria:
