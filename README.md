@@ -1,5 +1,5 @@
 # harbor-tile
-Project to build the tile for Harbor based on Harbor bosh release.
+Project to build the PCF Ops Manager tile for Harbor based on Harbor bosh release.
 
 **NOTES: Tile for Harbor is still under development. It's very unstable and may be not usable some time.**
 
@@ -28,7 +28,7 @@ pip install tile-generator
 ```
 
 ### Pivotal Ops Manager
-If you want to build you own ops manager environment to validate the tile you build, you can follow the document below to deploy Ops Manager on vSphere (For other IaaS platform, please refer the Povital document).
+If you want to setup your own Ops Manager environment to validate the tile, you can follow the document below to deploy Ops Manager on vSphere (For other IaaS platform, please refer the Pivotal document).
 
 * [Deploying Operations Manager to vSphere](http://docs.pivotal.io/pivotalcf/1-12/customizing/deploying-vm.html)
 * [Configuring Ops Manager Director for VMware vSphere](http://docs.pivotal.io/pivotalcf/1-12/customizing/vsphere-config.html)
@@ -41,13 +41,13 @@ tile init
 
 ```
 
-**NOTES:To avoid keeping too large files in this repository, the Harbor BOSH release tarball this tile required is not pushed here. So before building the tile, you need to create the Harbor BOSH release tarball firstly if you don't have it in hands.**
+**NOTES:To avoid keeping too large files in this repository, the Harbor BOSH release tarball this tile required is not pushed here. So before building the tile, you need to first create the Harbor BOSH release tarball if you don't have it in hands.**
 
 Create Harbor BOSH release with tarball and put it under the resource folder. If tarball name changed, don't forget to change the release reference in the tile.yml.
 ```
-git clone https://github.com/steven-zou/harbor-bosh-release
+git clone https://gitlab.eng.vmware.com/harbor/habo.git
 
-cd harbor-bosh-release
+cd habo
 
 #--force create dev release, --final create formal release
 bosh create-release --name harbor-bosh-release --version <new version> --tarball=<tarball path and name> --[force/final]
@@ -82,7 +82,7 @@ description: Project Harbor is an enterprise-class registry server that stores a
 packages:
 - name: harbor
   type: bosh-release
-  path: resources/harbor-0.3.0.tgz
+  path: resources/harbor-bosh-release-1.2.0.tgz
   jobs:
   - name: docker
     templates:
@@ -268,4 +268,4 @@ Check the status after a successfully deployment.
 ![import product](resources/status_check.png)
 
 ## Example
-Here is a sample provided by Pivotal team for your reference.[sample](https://github.com/cf-platform-eng/tile-generator/tree/master/sample)
+Here is a [sample tile](https://github.com/cf-platform-eng/tile-generator/tree/master/sample) provided by Pivotal team for your reference.
